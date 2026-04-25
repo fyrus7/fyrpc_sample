@@ -14,6 +14,37 @@ body {
   overflow:hidden;
 }
 
+  /* scan box ONLY (hijau area) */
+.scan-box {
+  position: absolute;
+  width: 70%;
+  height: 35%;
+  top: 32.5%;
+  left: 15%;
+
+  border: 2px solid rgba(255,255,255,0.4);
+
+  /* ❌ BUANG INI */
+  /* box-shadow: 0 0 0 9999px rgba(0,0,0,0.6); */
+
+  background: transparent;
+  overflow: hidden;
+}
+
+/* red scan line */
+.scan-line {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: red;
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+  
 /* container */
 #scanner-container {
   position: relative;
@@ -32,33 +63,6 @@ body {
   position: absolute;
   inset: 0;
   background: rgba(0,0,0,0.6);
-}
-
-/* scan box */
-.scan-box {
-  position: absolute;
-  width: 70%;
-  height: 35%;
-  top: 32.5%;
-  left: 15%;
-  border: 2px solid rgba(255,255,255,0.25);
-  box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
-  overflow: hidden;
-}
-
-/* red scan line */
-.scan-line {
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: red;
-  top: 0;
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  0% { top: 0; }
-  100% { top: 100%; }
 }
 
 /* hide html5-qrcode UI */
