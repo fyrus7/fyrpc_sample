@@ -10,48 +10,55 @@
 body {
   margin:0;
   background:black;
+  font-family:sans-serif;
   overflow:hidden;
+}
+
+/* container */
+#scanner-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
 }
 
 /* camera */
 #reader {
-  width:100vw;
-  height:100vh;
+  width: 100%;
+  height: 100%;
 }
 
 /* dark overlay */
 .overlay {
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.6);
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
 }
 
-/* scan frame sahaja (no white box) */
+/* scan box */
 .scan-box {
-  position:absolute;
-  width:70%;
-  height:35%;
-  top:32.5%;
-  left:15%;
-
-  border:2px solid rgba(255,255,255,0.3);
+  position: absolute;
+  width: 70%;
+  height: 35%;
+  top: 32.5%;
+  left: 15%;
+  border: 2px solid rgba(255,255,255,0.25);
   box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
-  overflow:hidden;
-  background:transparent; /* penting */
+  overflow: hidden;
 }
 
-/* red line */
+/* red scan line */
 .scan-line {
-  position:absolute;
-  width:100%;
-  height:2px;
-  background:red;
-  animation:scan 2s linear infinite;
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: red;
+  top: 0;
+  animation: scan 2s linear infinite;
 }
 
 @keyframes scan {
-  0% { top:0; }
-  100% { top:100%; }
+  0% { top: 0; }
+  100% { top: 100%; }
 }
 
 /* hide html5-qrcode UI */
@@ -64,38 +71,64 @@ body {
 
 <body>
 
-<div id="reader"></div>
+<div id="scanner-container">
+  <div id="reader"></div>
 
-<div class="overlay">
-  <div class="scan-box">
-    <div class="scan-line"></div>
+  <div class="overlay">
+    <div class="scan-box">
+      <div class="scan-line"></div>
+    </div>
   </div>
 </div>
 
 <script>
 
-const html5QrCode = new Html5Qrcode("reader");
+// 🔴 LETAK URL GAS KAU SINI
+const GAS_URL = "https://script.google.com/macros/s/YOUR_URL/exec";
+
 let scanned = false;
 
+// bila scan berjaya
 function onScanSuccess(decodedText) {
 
   if (scanned) return;
   scanned = true;
 
+  // vibration (optional)
   if (navigator.vibrate) navigator.vibrate(100);
 
+  // bunyi beep simple
   try {
-    new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
+    const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+    beep.play();
   } catch(e){}
 
+  // stop camera
   html5QrCode.stop();
 
-  alert("Scanned: " + decodedText);
+  // 🔥 OPTION A: hantar ke GAS (POST)
+  fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify({ qr: decodedText }),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(() => {
+    // redirect balik GAS UI
+    window.location.href = GAS_URL + "?qr=" + encodeURIComponent(decodedText);
+  })
+  .catch(() => {
+    alert("Error send data");
+  });
+
 }
+
+
+// init scanner
+const html5QrCode = new Html5Qrcode("reader");
 
 Html5Qrcode.getCameras().then(devices => {
 
-  if (devices.length) {
+  if (devices && devices.length) {
 
     html5QrCode.start(
       { facingMode: "environment" },
@@ -106,8 +139,12 @@ Html5Qrcode.getCameras().then(devices => {
       onScanSuccess
     );
 
+  } else {
+    alert("No camera found");
   }
 
+}).catch(err => {
+  alert("Camera error: " + err);
 });
 
 </script>
