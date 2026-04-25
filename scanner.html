@@ -2,61 +2,57 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clean Scanner</title>
+<title>Square Scanner</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
 <style>
 body {
-  margin: 0;
-  background: black;
-  overflow: hidden;
+  margin:0;
+  background:black;
+  overflow:hidden;
 }
 
-/* camera fullscreen */
+/* camera */
 #reader {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
+  width:100vw;
+  height:100vh;
+  position:relative;
 }
 
-/* 🔴 BUANG semua UI html5-qrcode */
-#reader video {
-  object-fit: cover;
-}
-
+/* hide default UI text */
 #reader__dashboard,
-#reader__status_span,
-#reader__scan_region,
-#reader__scan_region img {
-  display: none !important;
+#reader__status_span {
+  display:none !important;
 }
 
-/* ✅ SINGLE BOX ONLY */
+/* ✅ SINGLE SQUARE BOX */
 .scan-box {
-  position: absolute;
-  width: 70%;
-  height: 35%;
-  top: 32.5%;
-  left: 15%;
+  position:absolute;
+  width:260px;
+  height:260px;
 
-  border: 2px solid rgba(255,255,255,0.5);
-  box-sizing: border-box;
-  pointer-events: none;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+
+  border:2px solid rgba(255,255,255,0.5);
+  box-sizing:border-box;
+  pointer-events:none;
 }
 
 /* red scan line */
 .scan-line {
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: red;
-  animation: scan 2s linear infinite;
+  position:absolute;
+  width:100%;
+  height:2px;
+  background:red;
+  animation:scan 2s linear infinite;
 }
 
 @keyframes scan {
-  0% { top: 0; }
-  100% { top: 100%; }
+  0% { top:0; }
+  100% { top:100%; }
 }
 </style>
 </head>
@@ -90,7 +86,6 @@ function onScanSuccess(decodedText) {
   alert("Scanned: " + decodedText);
 }
 
-// 🔥 IMPORTANT: disable internal shading
 Html5Qrcode.getCameras().then(devices => {
 
   if (devices.length) {
@@ -99,10 +94,10 @@ Html5Qrcode.getCameras().then(devices => {
       { facingMode: "environment" },
       {
         fps: 10,
-        qrbox: 250,
 
-        // 🔴 ini yang buang rectangle library
-        disableFlip: false
+        // 🔥 KUNCI: square region
+        qrbox: { width: 260, height: 260 }
+
       },
       onScanSuccess
     );
@@ -114,4 +109,4 @@ Html5Qrcode.getCameras().then(devices => {
 </script>
 
 </body>
-</html>w
+</html>
