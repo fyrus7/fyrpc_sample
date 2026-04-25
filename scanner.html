@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Square Scanner</title>
+<title>Perfect Align Scanner</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -20,28 +20,28 @@ body {
   position:relative;
 }
 
-/* hide default UI text */
+/* hide UI */
 #reader__dashboard,
 #reader__status_span {
   display:none !important;
 }
 
-/* ✅ SINGLE SQUARE BOX */
+/* ✅ EXACT MATCH BOX */
 .scan-box {
   position:absolute;
-  width:260px;
-  height:260px;
+  width:60vmin;
+  height:60vmin;
 
   top:50%;
   left:50%;
   transform:translate(-50%, -50%);
 
-  border:2px solid rgba(255,255,255,0.5);
+  border:2px solid rgba(255,255,255,0.6);
   box-sizing:border-box;
   pointer-events:none;
 }
 
-/* red scan line */
+/* red line */
 .scan-line {
   position:absolute;
   width:100%;
@@ -77,13 +77,9 @@ function onScanSuccess(decodedText) {
 
   if (navigator.vibrate) navigator.vibrate(100);
 
-  try {
-    new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
-  } catch(e){}
-
   html5QrCode.stop();
 
-  alert("Scanned: " + decodedText);
+  alert(decodedText);
 }
 
 Html5Qrcode.getCameras().then(devices => {
@@ -95,8 +91,11 @@ Html5Qrcode.getCameras().then(devices => {
       {
         fps: 10,
 
-        // 🔥 KUNCI: square region
-        qrbox: { width: 260, height: 260 }
+        // 🔥 MATCH EXACT dengan CSS
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+          let size = Math.min(viewfinderWidth, viewfinderHeight) * 0.6;
+          return { width: size, height: size };
+        }
 
       },
       onScanSuccess
@@ -105,7 +104,6 @@ Html5Qrcode.getCameras().then(devices => {
   }
 
 });
-
 </script>
 
 </body>
