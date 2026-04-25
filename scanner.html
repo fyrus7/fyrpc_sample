@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fy Scanner</title>
+<title>Pure Scanner</title>
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 
@@ -10,58 +10,16 @@
 body {
   margin:0;
   background:black;
-  font-family:sans-serif;
   overflow:hidden;
 }
 
-/* container */
-#scanner-container {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-}
-
-/* camera */
+/* camera full screen */
 #reader {
-  width: 100%;
-  height: 100%;
+  width:100vw;
+  height:100vh;
 }
 
-/* dark overlay */
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-}
-
-/* scan box */
-.scan-box {
-  position: absolute;
-  width: 70%;
-  height: 35%;
-  top: 32.5%;
-  left: 15%;
-  border: 2px solid rgba(255,255,255,0.25);
-  box-shadow: 0 0 0 9999px rgba(0,0,0,0.6);
-  overflow: hidden;
-}
-
-/* red scan line */
-.scan-line {
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: red;
-  top: 0;
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  0% { top: 0; }
-  100% { top: 100%; }
-}
-
-/* hide html5-qrcode UI */
+/* buang semua UI html5-qrcode */
 #reader__dashboard,
 #reader__status_span {
   display:none !important;
@@ -71,80 +29,49 @@ body {
 
 <body>
 
-<div id="scanner-container">
-  <div id="reader"></div>
-
-  <div class="overlay">
-    <div class="scan-box">
-      <div class="scan-line"></div>
-    </div>
-  </div>
-</div>
+<div id="reader"></div>
 
 <script>
 
-// 🔴 LETAK URL GAS KAU SINI
-const GAS_URL = "https://script.google.com/macros/s/YOUR_URL/exec";
+const html5QrCode = new Html5Qrcode("reader");
 
 let scanned = false;
 
-// bila scan berjaya
 function onScanSuccess(decodedText) {
 
   if (scanned) return;
   scanned = true;
 
-  // vibration (optional)
+  // vibrate
   if (navigator.vibrate) navigator.vibrate(100);
 
-  // bunyi beep simple
+  // bunyi
   try {
-    const beep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-    beep.play();
+    new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
   } catch(e){}
 
-  // stop camera
   html5QrCode.stop();
 
-  // 🔥 OPTION A: hantar ke GAS (POST)
-  fetch(GAS_URL, {
-    method: "POST",
-    body: JSON.stringify({ qr: decodedText }),
-    headers: { "Content-Type": "application/json" }
-  })
-  .then(() => {
-    // redirect balik GAS UI
-    window.location.href = GAS_URL + "?qr=" + encodeURIComponent(decodedText);
-  })
-  .catch(() => {
-    alert("Error send data");
-  });
+  // test output
+  alert("Scanned: " + decodedText);
 
 }
 
-
-// init scanner
-const html5QrCode = new Html5Qrcode("reader");
-
 Html5Qrcode.getCameras().then(devices => {
 
-  if (devices && devices.length) {
+  if (devices.length) {
 
     html5QrCode.start(
       { facingMode: "environment" },
       {
         fps: 10,
-        qrbox: { width: 250, height: 150 }
+        qrbox: 250 // still helps detection walaupun tak nampak
       },
       onScanSuccess
     );
 
-  } else {
-    alert("No camera found");
   }
 
-}).catch(err => {
-  alert("Camera error: " + err);
 });
 
 </script>
