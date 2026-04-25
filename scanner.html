@@ -17,9 +17,22 @@ body {
 #reader {
   width: 100vw;
   height: 100vh;
+  position: relative;
 }
 
-/* scan box (yang kau tanda hijau) */
+/* 🔴 BUANG semua UI html5-qrcode */
+#reader video {
+  object-fit: cover;
+}
+
+#reader__dashboard,
+#reader__status_span,
+#reader__scan_region,
+#reader__scan_region img {
+  display: none !important;
+}
+
+/* ✅ SINGLE BOX ONLY */
 .scan-box {
   position: absolute;
   width: 70%;
@@ -27,9 +40,9 @@ body {
   top: 32.5%;
   left: 15%;
 
-  border: 2px solid rgba(255,255,255,0.4);
-  background: transparent;
-  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 /* red scan line */
@@ -45,12 +58,6 @@ body {
   0% { top: 0; }
   100% { top: 100%; }
 }
-
-/* hide html5-qrcode default UI */
-#reader__dashboard,
-#reader__status_span {
-  display: none !important;
-}
 </style>
 </head>
 
@@ -65,7 +72,6 @@ body {
 <script>
 
 const html5QrCode = new Html5Qrcode("reader");
-
 let scanned = false;
 
 function onScanSuccess(decodedText) {
@@ -73,10 +79,8 @@ function onScanSuccess(decodedText) {
   if (scanned) return;
   scanned = true;
 
-  // vibration
   if (navigator.vibrate) navigator.vibrate(100);
 
-  // beep
   try {
     new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg").play();
   } catch(e){}
@@ -86,7 +90,7 @@ function onScanSuccess(decodedText) {
   alert("Scanned: " + decodedText);
 }
 
-// start camera
+// 🔥 IMPORTANT: disable internal shading
 Html5Qrcode.getCameras().then(devices => {
 
   if (devices.length) {
@@ -95,17 +99,16 @@ Html5Qrcode.getCameras().then(devices => {
       { facingMode: "environment" },
       {
         fps: 10,
-        qrbox: { width: 250, height: 150 }
+        qrbox: 250,
+
+        // 🔴 ini yang buang rectangle library
+        disableFlip: false
       },
       onScanSuccess
     );
 
-  } else {
-    alert("No camera found");
   }
 
-}).catch(err => {
-  alert("Camera error: " + err);
 });
 
 </script>
